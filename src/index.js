@@ -1,22 +1,17 @@
 import { greeting, projectLogic } from "./script.js";
 import "./styles.css";
 
-console.log(greeting);
+// console.log(greeting);
 
-projectLogic.addProject("homework");
+// projectLogic.addProject("homework");
 
-console.log(projectLogic.myProjects);
-projectLogic.myProjects[0].addTask("math", "algebra", "2025-11-22", "high");
-projectLogic.myProjects[0].addTask('english', 'essay', '2025-12-12', 'medium');
-// projectLogic.myProjects[0].deleteTask(1);
-console.log(projectLogic.myProjects[0].tasks);
-projectLogic.myProjects[0].editTask(1, 'chinese', 'practice test', '2025-12-25', 'low', 'complete');
+// console.log(projectLogic.myProjects);
+// projectLogic.myProjects[0].addTask("math", "algebra", "2025-11-22", "high");
+// projectLogic.myProjects[0].addTask('english', 'essay', '2025-12-12', 'medium');
+// console.log(projectLogic.myProjects[0].tasks);
+// projectLogic.myProjects[0].editTask(1, 'chinese', 'practice test', '2025-12-25', 'low', 'complete');
 
-// console.log(myProjects[0]);
-// // console.log(myProjects[0].tasks);
 
-// myProjects[0].tasks[1].priority = 'high';
-// console.log(myProjects[0].tasks);
 const sidebar = document.querySelector(".sidebar");
 const main = document.querySelector(".main");
 const extraFormBox = document.querySelector(".extraFormBox");
@@ -30,9 +25,49 @@ const clearEditTaskFormBox = () => editTaskFormBox.innerHTML = '';
 const addProjectForm = document.querySelector("#addProject");
 
 
+function saveData() {
+    localStorage.setItem('savedData', JSON.stringify(projectLogic.myProjects));
+};
+
+function getData() {
+    const storedData = localStorage.getItem('savedData');
+
+    if (storedData) {
+        const projectsData = JSON.parse(storedData)
+        // console.log(projectsData);
+        return projectsData;
+    }
+
+    else {}
+};
+
+// getData();
+// console.log(getData());
+function populateProjects() {
+    const retrieveProjects = getData();
+    if (typeof retrieveProjects !== 'undefined') {
+        let pIndex = 0;
+        retrieveProjects.forEach((p) => {
+            projectLogic.addProject(p.name);
+            // console.log(pIndex);
+            let toDos = p.tasks;
+            toDos.forEach((t) => {
+                projectLogic.myProjects[pIndex].addTask(t.title, t.description, t.dueDate, t.priority);
+            })
+            pIndex++;
+        })
+        // saveData();
+    }
+
+    else {}; 
+};
+populateProjects();
+
+
 function displayProjects() {
     const projects = projectLogic.myProjects;
     const clearMainDisplay = () => main.innerHTML = '';
+    // console.log(projects);
 
     for (let project of projects) {
         const div = document.createElement("div");
@@ -51,6 +86,7 @@ function displayProjects() {
             const indexRemove = projects.findIndex(item => item.id == x);
             projects.splice(indexRemove, 1);
             clearMainDisplay();
+            saveData();
         });
         div.append(newButton);
 
@@ -218,6 +254,7 @@ function displayProjects() {
 
                             projects[indexLook].editTask(btnEditTaskID, editTaskTile, editTaskDesc, editTaskDueDate, editTaskPriority, editTaskComplete);
                             // console.log(task);
+                            saveData();
                             clearMainDisplay();
                             displayTasks();
                             clearEditTaskFormBox();
@@ -234,11 +271,13 @@ function displayProjects() {
                             task.complete = 'Complete';
                             // console.log(task.complete);
                             btnTaskStatus.textContent = `${task.complete}`;
+                            saveData();
                         }
                         else {
                             task.complete = 'Incomplete';
                             // console.log(task.complete);
                             btnTaskStatus.textContent = `${task.complete}`;
+                            saveData();
                         }
                     });
 
@@ -250,6 +289,7 @@ function displayProjects() {
                     btnDeleteTask.addEventListener('click', () => {
                         projects[indexLook].tasks.splice(btnDeleteTaskID, 1);
                         console.log(projects[indexLook].tasks);
+                        saveData(); 
                         clearMainDisplay();
                         displayTasks();
                     })
@@ -268,6 +308,7 @@ function displayProjects() {
                 const taskPriority = document.querySelector('#taskPriority').value;
                 const taskDesc = document.querySelector('#taskDesc').value;
                 projects[indexLook].addTask(taskTitle, taskDesc, taskDueDate, taskPriority);
+                saveData();
                 clearMainDisplay();
                 // clearExtraFormBox();
                 displayTasks();
@@ -282,8 +323,11 @@ function displayProjects() {
             });
         });
         div.appendChild(showTasksButton);
+        // saveData();
+        console.log(projects);
 
-    }; 
+    };
+
 };
 
 displayProjects();
@@ -292,6 +336,7 @@ addProjectForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const newProjectName = document.querySelector("#projectName").value;
     projectLogic.addProject(newProjectName);
+    saveData();
     clearProjectDisplay();
     displayProjects();
     addProjectForm.reset();
