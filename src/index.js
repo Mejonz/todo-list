@@ -129,7 +129,7 @@ function displayProjects() {
                     </select>
                 </div>
                 <div>
-                    <label for="taskDesc">Task Description</label>
+                    <label for="taskDesc">Task Description:</label>
                     <textarea name="taskDesc" id="taskDesc"></textarea>
                 </div>
                 <button type="submit" id="AddTaskBtn">Add Task</button>
@@ -163,6 +163,11 @@ function displayProjects() {
             
             function displayTasks() {
                 let indexTask = 0;
+                const projectNameHeader = projects[indexLook].name;
+                // console.log(projectNameHeader);
+                const projectTitleDiv = document.createElement('h2');
+                main.appendChild(projectTitleDiv);
+                projectTitleDiv.textContent = projectNameHeader;
                 for (let task of projectTasks) {
                     const div = document.createElement("div");
                     div.classList.add('toDoCard');
@@ -178,11 +183,24 @@ function displayProjects() {
 
                     const toDoPriority = document.createElement("p");
                     div.appendChild(toDoPriority);
+                    toDoPriority.classList.add('toDoPriority');
                     toDoPriority.textContent = "Priority: " + `${task.priority}`;
+
+                    function changeColor() {
+                        if (task.priority == 'low') {
+                            toDoPriority.style.color = 'green';
+                        }
+                        else if (task.priority == 'medium') {
+                            toDoPriority.style.color = 'yellow';
+                        }
+
+                        else { toDoPriority.style.color = 'red';}
+                    }
+                    changeColor();
 
                     const toDoDesc = document.createElement("p");
                     div.appendChild(toDoDesc);
-                    toDoDesc.textContent =`${task.description}`;
+                    toDoDesc.textContent ="Task Description: " + `${task.description}`;
 
                     const btnEditTask = document.createElement("button");
                     div.appendChild(btnEditTask);
@@ -236,9 +254,9 @@ function displayProjects() {
 
                         document.querySelector('#editTaskTitle').defaultValue = task.title;
                         document.querySelector('#editTaskDueDate').defaultValue = task.dueDate;
-                        document.querySelector('#editTaskPriority').defaultValue = task.priority;
+                        document.querySelector('#editTaskPriority').value = task.priority;
                         document.querySelector('#editTaskDesc').defaultValue = task.description;
-                        document.querySelector('#editTaskComplete').defaultValue = task.complete;
+                        document.querySelector('#editTaskComplete').value = task.complete;
 
                         
 
@@ -266,17 +284,27 @@ function displayProjects() {
                     div.appendChild(btnTaskStatus);
                     btnTaskStatus.textContent = `${task.complete}`;
 
+                    function taskStatusColor() {
+                        if (task.complete == 'Incomplete') {
+                            btnTaskStatus.style.color = 'red';
+                        }
+                        else { btnTaskStatus.style.color = 'green' }
+                    };
+                    taskStatusColor();
+
                     btnTaskStatus.addEventListener('click', () => {
                         if (task.complete == 'Incomplete') {
                             task.complete = 'Complete';
                             // console.log(task.complete);
                             btnTaskStatus.textContent = `${task.complete}`;
+                            btnTaskStatus.style.color = 'green';
                             saveData();
                         }
                         else {
                             task.complete = 'Incomplete';
                             // console.log(task.complete);
                             btnTaskStatus.textContent = `${task.complete}`;
+                            btnTaskStatus.style.color = 'red';
                             saveData();
                         }
                     });
